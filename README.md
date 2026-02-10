@@ -1,33 +1,34 @@
-# Metasploitable 2 en VMware – Guía paso a paso
+## 1. Descarga de Metasploitable 2
 
-Esta guía documenta, paso a paso, cómo descargar, configurar e importar **Metasploitable 2** en **VMware** para usarlo en un entorno de laboratorio.
+El primer paso es obtener Metasploitable 2 desde la página oficial de Rapid7:
 
-> ⚠️ Aviso: Metasploitable 2 es una máquina **intencionadamente vulnerable**.  
-> Debe usarse únicamente en entornos de laboratorio aislados. No la expongas a Internet ni a redes de producción.
+https://www.rapid7.com/products/metasploit/metasploitable/
 
----
+En esa página, se pulsa el botón **Download** para descargar la máquina virtual.
 
-## Requisitos
+El archivo descargado es un **.zip**, que contiene los ficheros de la máquina virtual.
 
-- VMware (Workstation / Player)
-- Un equipo con virtualización habilitada
-- Espacio en disco suficiente
+## 2. Extracción de los archivos
 
----
+Una vez descargado el archivo ZIP:
 
-## Estructura de la guía
+1. Se descomprime en el equipo local.
+2. Tras la extracción, se obtiene una carpeta que contiene varios archivos, entre ellos:
+   - `Metasploitable.vmx` (archivo de configuración de la máquina virtual)
+   - `Metasploitable.vmdk` (disco virtual)
 
-Esta documentación se irá completando con los siguientes apartados:
+Esta carpeta será la que se utilice para importar la máquina en VMware.
 
-1. Descarga de Metasploitable 2 desde fuentes oficiales  
-2. Verificación y extracción de los archivos descargados  
-3. Creación / importación de la máquina virtual en VMware  
-4. Configuración de red segura para laboratorio  
-5. Arranque de la máquina y acceso al sistema  
-6. Verificación del entorno de laboratorio  
+## 3. Importar Metasploitable en VMware
 
----
+1. Abrir **VMware**.
+2. En el menú superior, ir a:  
+   **Archivo > Abrir**
+3. Navegar hasta la carpeta donde se extrajo Metasploitable.
+4. Seleccionar el archivo:
+  Metasploitable.vmx
+5. Pulsar en **Abrir**.
 
-## Estado del documento
+VMware cargará la configuración de la máquina virtual y, tras esto, **la máquina quedará lista para usarse**.
 
-Este README se encuentra en desarrollo y se irá actualizando paso a paso con capturas y explicaciones detalladas de cada fase del proceso.
+En este punto, Metasploitable 2 ya está importada correctamente en VMware y preparada para su configuración y arranque.

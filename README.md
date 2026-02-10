@@ -45,11 +45,11 @@ Credenciales por defecto:
 - Usuario: `msfadmin`
 - Contraseña: `msfadmin`
 
-![Pantalla de login de Metasploitable](images/05-login-screen.png)
+![Pantalla de login de Metasploitable](images/01-login-screen.png)
 
 Introduciendo estas credenciales se accede correctamente al sistema.
 
-![Sesión iniciada correctamente](images/06-successful-login.png)
+![Sesión iniciada correctamente](images/02-successful-login.png)
 
 Una vez dentro, se muestra un prompt de terminal bajo el usuario `msfadmin`, lo que confirma que la máquina está funcionando correctamente y lista para ser utilizada en el laboratorio.
 

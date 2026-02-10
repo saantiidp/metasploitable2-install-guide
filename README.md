@@ -32,3 +32,24 @@ Esta carpeta será la que se utilice para importar la máquina en VMware.
 VMware cargará la configuración de la máquina virtual y, tras esto, **la máquina quedará lista para usarse**.
 
 En este punto, Metasploitable 2 ya está importada correctamente en VMware y preparada para su configuración y arranque.
+
+## 4. Primer arranque y acceso al sistema
+
+Una vez importada la máquina virtual en VMware, se puede iniciar normalmente desde la interfaz del programa.
+
+Durante el arranque, Metasploitable 2 muestra un aviso indicando que la máquina **no debe exponerse a redes no confiables**, ya que contiene múltiples servicios vulnerables por diseño.
+
+Tras finalizar el proceso de inicio, aparece la pantalla de login del sistema.
+
+Credenciales por defecto:
+- Usuario: `msfadmin`
+- Contraseña: `msfadmin`
+
+![Pantalla de login de Metasploitable](images/05-login-screen.png)
+
+Introduciendo estas credenciales se accede correctamente al sistema.
+
+![Sesión iniciada correctamente](images/06-successful-login.png)
+
+Una vez dentro, se muestra un prompt de terminal bajo el usuario `msfadmin`, lo que confirma que la máquina está funcionando correctamente y lista para ser utilizada en el laboratorio.
+

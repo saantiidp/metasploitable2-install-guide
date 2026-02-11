@@ -1,3 +1,23 @@
+# Metasploitable 2 en VMware – Guía práctica de instalación, enumeración y explotación
+
+## Introducción
+
+En esta práctica se trabaja con **Metasploitable 2**, una máquina virtual deliberadamente vulnerable diseñada para el aprendizaje de seguridad ofensiva y pruebas de penetración en entornos controlados. El objetivo es desplegar la máquina en **VMware**, verificar la conectividad de red y realizar un proceso completo de **enumeración, explotación y post-explotación** utilizando herramientas habituales como **Nmap** y **Metasploit Framework**.
+
+A lo largo del laboratorio se cubren los siguientes puntos:
+
+- Descarga e importación de Metasploitable 2 en VMware.
+- Identificación de la dirección IP y verificación de conectividad desde Kali Linux.
+- Enumeración completa de puertos y servicios con Nmap.
+- Identificación de configuraciones inseguras (FTP anónimo).
+- Explotación de una vulnerabilidad conocida en **vsftpd 2.3.4**.
+- Obtención de acceso remoto mediante reverse shell.
+- Ataque de fuerza bruta contra el servicio SSH usando diccionarios.
+- Acceso al sistema mediante credenciales débiles.
+- Escalada de privilegios mediante una mala configuración de `sudo`.
+
+Esta guía está pensada **exclusivamente para entornos de laboratorio y aprendizaje**. Metasploitable 2 es intencionadamente insegura y no debe exponerse nunca a redes reales o no controladas.
+
 ## 1. Descarga de Metasploitable 2
 
 El primer paso es obtener Metasploitable 2 desde la página oficial de Rapid7:

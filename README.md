@@ -449,3 +449,34 @@ root
 - El sistema queda completamente comprometido.
 
 En un entorno real, esto debería corregirse limitando estrictamente qué usuarios pueden usar `sudo` y qué comandos pueden ejecutar, aplicando el principio de mínimos privilegios.
+
+
+## 12. Conclusiones
+
+Esta práctica ha permitido reproducir un escenario completo de compromiso de un sistema vulnerable en un entorno controlado, siguiendo un flujo realista de trabajo en pentesting y seguridad ofensiva.
+
+A lo largo del laboratorio se han puesto en práctica las siguientes habilidades:
+
+- Despliegue y preparación de un entorno vulnerable en VMware.
+- Identificación de activos en red y verificación de conectividad.
+- Enumeración exhaustiva de servicios y versiones mediante Nmap.
+- Detección de configuraciones inseguras (FTP con acceso anónimo).
+- Identificación de vulnerabilidades conocidas en servicios expuestos (vsftpd 2.3.4).
+- Explotación de una vulnerabilidad crítica que permite ejecución remota de comandos (RCE).
+- Obtención de acceso remoto mediante reverse shell usando Metasploit.
+- Ataque de fuerza bruta contra un servicio SSH usando diccionarios personalizados.
+- Acceso al sistema mediante credenciales débiles.
+- Escalada de privilegios debido a una mala configuración de sudo.
+
+Este laboratorio demuestra cómo una combinación de **servicios vulnerables, credenciales débiles y malas configuraciones** puede llevar al **compromiso total de un sistema**, incluso sin necesidad de vulnerabilidades complejas.
+
+Desde el punto de vista defensivo, refuerza la importancia de:
+
+- Mantener los servicios actualizados.
+- Deshabilitar accesos anónimos innecesarios.
+- Usar contraseñas robustas y políticas de autenticación seguras.
+- Restringir correctamente los privilegios de sudo.
+- Monitorizar y auditar los servicios expuestos a red.
+
+En conjunto, esta práctica consolida conocimientos fundamentales de **enumeración, explotación, post-explotación y escalada de privilegios**, y refleja un flujo de trabajo realista utilizado en auditorías de seguridad y pruebas de penetración profesionales.
+

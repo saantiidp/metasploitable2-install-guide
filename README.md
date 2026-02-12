@@ -655,7 +655,7 @@ Target domain ............
 El siguiente puerto clave es `80/tcp`. Si abrimos el navegador y visitamos:
 
 ```text
-http://192.168.184.130
+http://192.168.184.130:80
 ```
 
 veremos una página de índice con accesos a aplicaciones web conocidas en Metasploitable 2.

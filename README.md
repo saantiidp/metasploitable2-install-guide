@@ -517,12 +517,12 @@ telnet 192.168.184.130
 No se indica puerto porque Telnet usa el **23** por defecto.
 
 📷 **Imagen — Login Telnet**  
-![Telnet Login](image_telnet_login.png)
+![Telnet Login](images/image_telnet_login.png)
 
 En este laboratorio, el servicio está tan mal configurado que se observan credenciales o indicios que facilitan el acceso.
 
 📷 **Imagen — Sesión Telnet iniciada**  
-![Telnet Session](image_telnet_session.png)
+![Telnet Session](images/image_telnet_session.png)
 
 ---
 
@@ -549,7 +549,7 @@ Netcat permite “hablar” con servicios TCP directamente. Es útil tanto para:
 - Modo escucha (por ejemplo, esperando una reverse shell).
 
 📷 **Imagen — Conexión SMTP con HELO**  
-![SMTP HELO](image_smtp_helo.png)
+![SMTP HELO](images/image_smtp_helo.png)
 
 Una vez conectados, el servidor presenta el banner y podemos iniciar conversación con `HELO`:
 
@@ -661,7 +661,7 @@ http://192.168.184.130:80
 veremos una página de índice con accesos a aplicaciones web conocidas en Metasploitable 2.
 
 📷 **Imagen — Página principal**  
-![Web Home](image_web_home.png)
+![Web Home](images/image_web_home.png)
 
 ### 15.1 Enumeración de subrutas con ffuf
 
@@ -678,7 +678,7 @@ Explicación del comando:
 - `-w <wordlist>` → diccionario de rutas (DirBuster medium list).
 
 📷 **Imagen — Resultado ffuf**  
-![FFUF Results](image_ffuf.png)
+![FFUF Results](images/image_ffuf.png)
 
 Ejemplos de resultados:
 
@@ -694,7 +694,7 @@ phpMyAdmin              [Status: 301, Size: 328, Words: 21, Lines: 10, Duration:
 Por ejemplo, la ruta `/test` muestra un índice de directorio:
 
 📷 **Imagen — Directorio /test**  
-![Test Directory](image_test.png)
+![Test Directory](images/image_test.png)
 
 ### 15.2 `server-status` y `phpinfo`
 
@@ -704,7 +704,7 @@ Por ejemplo, la ruta `/test` muestra un índice de directorio:
 `phpinfo` es una clara vulnerabilidad de **fuga de información**: muestra configuración de PHP, módulos, rutas internas, etc.
 
 📷 **Imagen — phpinfo**  
-![PHP Info](image_phpinfo.png)
+![PHP Info](images/image_phpinfo.png)
 
 Un detalle importante es el campo **Server API**, donde aparece **FastCGI**, que indica cómo se está ejecutando PHP en el servidor web.
 
@@ -737,7 +737,7 @@ run
 Una vez dentro, se puede abrir una shell:
 
 📷 **Imagen — Meterpreter / shell**  
-![Meterpreter](image_meterpreter.png)
+![Meterpreter](images/image_meterpreter.png)
 
 ```text
 shell
@@ -886,18 +886,3 @@ Desde el punto de vista defensivo, la práctica refuerza:
 - Monitorizar y auditar los servicios expuestos a red.
 
 ---
-
-## Nota sobre imágenes
-
-Este documento referencia imágenes locales. Colócalas en el mismo repositorio/carpeta que el `.md` (o ajusta las rutas) con estos nombres:
-
-- `images/01-login-screen.png`
-- `images/02-successful-login.png`
-- `image_telnet_login.png`
-- `image_telnet_session.png`
-- `image_smtp_helo.png`
-- `image_web_home.png`
-- `image_ffuf.png`
-- `image_test.png`
-- `image_phpinfo.png`
-- `image_meterpreter.png`

